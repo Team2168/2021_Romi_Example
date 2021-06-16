@@ -51,6 +51,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    setupAutoChooser();
   }
 
   /**
@@ -64,19 +65,24 @@ public class RobotContainer {
     // is scheduled over it.
     m_drivetrain.setDefaultCommand(getArcadeDriveCommand());
     JoystickButton gyroResetButton = new JoystickButton(m_controller, 1); // A
-    JoystickButton intakeButton = new JoystickButton(m_controller, 2); // B
+    JoystickButton intakeButton = new JoystickButton(m_controller, 2);    // B
 
     gyroResetButton.whenPressed(new ZeroDrivetrainSensors(m_drivetrain));
     intakeButton
-      .whenPressed(new InstantCommand(m_intake::openIntake, m_intake))
-      .whenReleased(new InstantCommand(m_intake::closeIntake, m_intake));
+        .whenPressed(new InstantCommand(m_intake::openIntake, m_intake))
+        .whenReleased(new InstantCommand(m_intake::closeIntake, m_intake));
+  }
 
-    // Setup SmartDashboard options
-    m_chooser.addOption("Do Nothing", new WaitCommand(1.0));
-    m_chooser.setDefaultOption("Parking", new PathConverter(m_drivetrain, "output/Parking.wpilib.json").getCommand());
-    m_chooser.addOption("Score and Park", new ScoreAndPark(m_drivetrain, m_intake));
-    
-    SmartDashboard.putData(m_chooser);
+  /**
+   * Populate a dashboard chooser for auto mode selection.
+   */
+  private void setupAutoChooser() {
+      // Setup SmartDashboard options
+      m_chooser.addOption("Do Nothing", new WaitCommand(1.0));
+      m_chooser.setDefaultOption("Parking", new PathConverter(m_drivetrain, "output/Parking.wpilib.json").getCommand());
+      m_chooser.addOption("Score and Park", new ScoreAndPark(m_drivetrain, m_intake));
+      
+      SmartDashboard.putData(m_chooser);
   }
 
   /**
